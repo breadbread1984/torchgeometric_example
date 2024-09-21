@@ -4,7 +4,6 @@ from rdkit import Chem
 import numpy as np
 import torch
 from torch_geometric.data import Data
-from torch_geometric.loader import DataLoader
 from torch.utils.data import Dataset
 
 class Molecule(Dataset):
