@@ -4,6 +4,7 @@ from rdkit import Chem
 import numpy as np
 import torch
 from torch_geometric.data import Data
+from torch_geometric.loader import DataLoader
 from torch.utils.data import Dataset
 
 class Molecule(Dataset):
@@ -41,6 +42,7 @@ class Molecule(Dataset):
 
 if __name__ == "__main__":
   molecule = Molecule('dataset.csv')
-  for d in molecule:
+  loader = DataLoader(molecule, batch_size = 1, shuffle = True)
+  for d in loader:
     print(d)
     break
