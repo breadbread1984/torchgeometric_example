@@ -35,10 +35,11 @@ class Molecule(Dataset):
     edge_index = torch.tensor(edges, dtype = torch.long).t().contiguous()
     edge_type = torch.tensor(edges_type, dtype = torch.long)
     data = Data(x = x, edge_index = edge_index, edge_type = edge_type)
-    return data
+    return data, label
 
 if __name__ == "__main__":
   molecule = Molecule('dataset.csv')
-  for d in molecule:
-    print(d)
+  for d, l in molecule:
+    print(d.x,d.edge_index,d.edge_type)
+    print(l)
     break
