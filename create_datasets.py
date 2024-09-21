@@ -42,7 +42,6 @@ class Molecule(Dataset):
 
 if __name__ == "__main__":
   molecule = Molecule('dataset.csv')
-  loader = DataLoader(molecule, batch_size = 1, shuffle = True)
-  for d in loader:
+  for d in molecule:
     print(d)
     break
