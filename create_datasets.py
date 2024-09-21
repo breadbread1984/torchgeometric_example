@@ -21,23 +21,20 @@ class Molecule(Dataset):
     smiles, label = self.samples[index]
     molecule = Chem.MolFromSmiles(smiles)
     nodes = list()
-    nodes_num = list()
     edges = list()
     edges_type = list()
-    for atom in molecule.GetAtoms():
-      idx = atom.GetIdx()
-      nodes_num.append(atom.GetAtomicNum())
-      nodes.append([idx])
+    for idx, atom in enumerate(molecule.GetAtoms()):
+      assert idx == atom.GetIdx()
+      nodes.append([atom.GetAtomicNum()])
       for neighbor_atom in atom.GetNeighbors():
         neighbor_idx = neighbor_atom.GetIdx()
         bond = molecule.GetBondBetweenAtoms(idx, neighbor_idx)
         edges.append([idx, neighbor_idx])
         edges_type.append(bond.GetBondType())
     x = torch.tensor(nodes, dtype = torch.long)
-    node_num = torch.tensor(nodes_num, dtype = torch.long)
     edge_index = torch.tensor(edges, dtype = torch.long).t().contiguous()
     edge_type = torch.tensor(edges_type, dtype = torch.long)
-    data = Data(x = x, node_num = node_num, edge_index = edge_index, edge_type = edge_type)
+    data = Data(x = x, edge_index = edge_index, edge_type = edge_type)
     return data
 
 if __name__ == "__main__":
