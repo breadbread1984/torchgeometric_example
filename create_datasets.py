@@ -10,9 +10,10 @@ class Molecule(Dataset):
   def __init__(self, csv_path):
     self.samples = list()
     with open(csv_path, 'r') as f:
-      if line == 0: continue
-      smiles, label = row.split(',')
-      self.samples.append((smiles, label))
+      for line, row in enumerate(f.readlines()):
+        if line == 0: continue
+        smiles, label = row.split(',')
+        self.samples.append((smiles, label))
   def __len__(self):
     return len(self.samples)
   def __getitem__(self, index):
@@ -38,3 +39,8 @@ class Molecule(Dataset):
     data = Data(x = x, node_num = node_num, edge_index = edge_index, edge_type = edge_type)
     return data
 
+if __name__ == "__main__":
+  molecule = Molecule('dataset.csv')
+  for d in molecule:
+    print(d)
+    break
