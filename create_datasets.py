@@ -31,7 +31,7 @@ class Molecule(Dataset):
         bond = molecule.GetBondBetweenAtoms(idx, neighbor_idx)
         edges.append([idx, neighbor_idx])
         edges_type.append(bond.GetBondType())
-    x = F.one_hot(torch.tensor(nodes, dtype = torch.long),118) # x.shape = (node_num, 118)
+    x = F.one_hot(torch.tensor(nodes, dtype = torch.long),118).to(torch.float32) # x.shape = (node_num, 118)
     edge_index = torch.tensor(edges, dtype = torch.long).t().contiguous() # edge_index.shape = (2, edge_num)
     edge_type = torch.tensor(edges_type, dtype = torch.long) # edge_type.shape = (edge_num)
     data = Data(x = x, edge_index = edge_index, edge_type = edge_type, y = label)
