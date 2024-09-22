@@ -14,8 +14,7 @@ class SimpleConv(MessagePassing):
     self.dense2 = nn.Linear(channels, channels)
     self.dropout2 = nn.Dropout(drop_rate)
   def forward(self, x, edge_index):
-    # x.shape = (node_num, channels)
-    return self.propagate(edge_index, x = x, size = (x.shape[0], x.shape[0]))
+    return self.propagate(edge_index, x = x)
   def message(self, x):
     results = self.dense1(x)
     results = self.gelu(results)
@@ -27,23 +26,24 @@ class SimpleConv(MessagePassing):
     results = self.dropout2(results)
     return results
 
-class FeatureExtract(nn.Module):
+class ConductivityPredictor(nn.Module):
   def __init__(self, channels = 256, layer_num = 4, drop_rate = 0.2):
     super().__init__()
-    self.mode_embed = nn.Linear(118, channels)
+    self.node_embed = nn.Linear(118, channels)
     #self.edge_embed = nn.Linear(22, channels)
-    self.simpleconv = SimpleConv(channels, drop_rate)
+    self.convs = nn.ModuleList([SimpleConv(channels, drop_rate) for _ in range(layer_num)])
   def forward(self, data):
     atom_num, edge_index = data.x, data.edge_index # atom_num.shape = (num_node, 118) edge_index.shape = (2, edge_num)
-    atom_results = self.node_embed(atom_num) # atom_results.shape = (num_node, channels)
-    results = self.simpleconv(atom_results, edge_index) # results.shape = (num_node, channels)
+    results = self.node_embed(atom_num) # atom_results.shape = (num_node, channels)
+    for conv in self.convs:
+      results = conv(results, edge_index) # results.shape = (num_node, channels)
     results = torch.mean(results, dim = 1)
     return results
 
 if __name__ == "__main__":
   from torch_geometric.loader import DataLoader
   from create_datasets import Molecule
-  dataset = Molecule('dataset.csv')
+  dataset = ConductivityPredictor('dataset.csv')
   loader = DataLoader(dataset, batch_size = 32, shuffle = True)
   model = FeatureExtract()
   for data in loader:
