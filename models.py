@@ -3,7 +3,7 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
-from torch_geometric.nn import MessagePassing, aggr
+from torch_geometric.nn import MessagePassing, global_mean_pool, aggr
 
 class SimpleConv(MessagePassing):
   def __init__(self, channels = 256, drop_rate = 0.2):
@@ -32,12 +32,14 @@ class ConductivityPredictor(nn.Module):
     self.node_embed = nn.Linear(118, channels)
     #self.edge_embed = nn.Linear(22, channels)
     self.convs = nn.ModuleList([SimpleConv(channels, drop_rate) for _ in range(layer_num)])
+    self.head = nn.Linear(channels, 1)
   def forward(self, data):
-    atom_num, edge_index = data.x, data.edge_index # atom_num.shape = (num_node, 118) edge_index.shape = (2, edge_num)
+    atom_num, edge_index, batch = data.x, data.edge_index, data.batch # atom_num.shape = (num_node, 118) edge_index.shape = (2, edge_num)
     results = self.node_embed(atom_num) # atom_results.shape = (num_node, channels)
     for conv in self.convs:
       results = conv(results, edge_index) # results.shape = (num_node, channels)
-    results = torch.mean(results, dim = 1)
+    results = global_mean_pool(results, batch) # results.shape = (graph_num, channels)
+    results = self.head(results) # results.shape = (graph_num, 1)
     return results
 
 if __name__ == "__main__":
