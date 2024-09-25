@@ -18,7 +18,7 @@ FLAGS = flags.FLAGS
 
 def add_options():
   flags.DEFINE_string('input_csv', default = None, help = 'path to input csv')
-  falgs.DEFINE_integer('batch', default = 32, help = 'batch size')
+  flags.DEFINE_integer('batch', default = 32, help = 'batch size')
   flags.DEFINE_string('ckpt', default = 'ckpt', help = 'path to checkpoint')
   flags.DEFINE_float('lr', default = 1e-3, help = 'learning rate')
   flags.DEFINE_integer('decay_steps', default = 2000, help = 'decay steps')
