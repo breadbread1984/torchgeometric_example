@@ -24,6 +24,7 @@ def add_options():
   flags.DEFINE_string('ckpt', default = 'ckpt', help = 'path to checkpoint')
   flags.DEFINE_float('lr', default = 1e-3, help = 'learning rate')
   flags.DEFINE_integer('decay_steps', default = 2000, help = 'decay steps')
+  flags.DEFINE_integer('epochs', default = 100, help = 'number of epochs')
   flags.DEFINE_integer('workers', default = 16, help = 'number of workers')
   flags.DEFINE_enum('device', default = 'cuda', enum_values = {'cpu', 'cuda'}, help = 'device to use')
 
