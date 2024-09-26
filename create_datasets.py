@@ -14,7 +14,7 @@ class Molecule(Dataset):
       for line, row in enumerate(f.readlines()):
         if line == 0: continue
         smiles, label = row.split(',')
-        self.samples.append((smiles, label))
+        self.samples.append((smiles, float(label)))
   def __len__(self):
     return len(self.samples)
   def __getitem__(self, index):
@@ -34,7 +34,7 @@ class Molecule(Dataset):
     x = F.one_hot(torch.tensor(nodes, dtype = torch.long),118).to(torch.float32) # x.shape = (node_num, 118)
     edge_index = torch.tensor(edges, dtype = torch.long).t().contiguous() # edge_index.shape = (2, edge_num)
     edge_type = F.one_hot(torch.tensor(edges_type, dtype = torch.long),22).to(torch.float32) # edge_type.shape = (edge_num)
-    data = Data(x = x, edge_index = edge_index, edge_type = edge_type, y = label)
+    data = Data(x = x, edge_index = edge_index, edge_type = edge_type, y = torch.tensor(label, dtype = torch.float32))
     return data
 
 if __name__ == "__main__":
