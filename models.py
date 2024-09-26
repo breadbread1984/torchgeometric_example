@@ -20,12 +20,15 @@ class SimpleConv(MessagePassing):
     source, dest = edge_index
     out = self.message(x) # out.shape = (node_num, channels)
     out = out[source,...] # out.shape = (edge_num, channels)
-    out = self.aggr(out, index = dest) # out.shape = (node_num, channels)
+    out = self.aggregate(out, index = dest) # out.shape = (node_num, channels)
     return self.update(out) # out.shape = (node_num, channels)
   def message(self, x):
     results = self.dense1(x)
     results = self.gelu(results)
     results = self.dropout1(results)
+    return results
+  def aggregate(self, inputs, index):
+    results = self.aggr(inputs, index = index)
     return results
   def update(self, aggr_out):
     results = self.dense2(aggr_out)
