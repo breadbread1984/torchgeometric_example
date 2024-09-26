@@ -7,7 +7,8 @@ from torch_geometric.nn import MessagePassing, global_mean_pool, aggr
 
 class SimpleConv(MessagePassing):
   def __init__(self, channels = 256, drop_rate = 0.2):
-    super().__init__(aggr = aggr.MeanAggregation())
+    super().__init__(aggr = None)
+    self.aggr = aggr.MeanAggregation()
     self.dense1 = nn.Linear(channels, channels)
     self.gelu = nn.GELU()
     self.dropout1 = nn.Dropout(drop_rate)
@@ -15,6 +16,12 @@ class SimpleConv(MessagePassing):
     self.dropout2 = nn.Dropout(drop_rate)
   def forward(self, x, edge_index):
     return self.propagate(edge_index, x = x)
+  def propagate(self, edge_index, x):
+    source, dest = edge_index
+    out = self.message(x) # out.shape = (node_num, channels)
+    out = out[source,...] # out.shape = (edge_num, channels)
+    out = self.aggr(out, index = dest) # out.shape = (node_num, channels)
+    return self.update(out) # out.shape = (node_num, channels)
   def message(self, x):
     results = self.dense1(x)
     results = self.gelu(results)
