@@ -20,9 +20,9 @@ FLAGS = flags.FLAGS
 
 def add_options():
   flags.DEFINE_string('input_csv', default = None, help = 'path to input csv')
-  flags.DEFINE_integer('batch', default = 32, help = 'batch size')
+  flags.DEFINE_integer('batch', default = 512, help = 'batch size')
   flags.DEFINE_string('ckpt', default = 'ckpt', help = 'path to checkpoint')
-  flags.DEFINE_float('lr', default = 1e-3, help = 'learning rate')
+  flags.DEFINE_float('lr', default = 1e-4, help = 'learning rate')
   flags.DEFINE_integer('decay_steps', default = 2000, help = 'decay steps')
   flags.DEFINE_integer('epochs', default = 100, help = 'number of epochs')
   flags.DEFINE_integer('workers', default = 16, help = 'number of workers')
@@ -66,7 +66,7 @@ def main(unused_argv):
       optimizer.step()
       global_steps = epoch * len(train_dataloader) + step
       if global_steps % 100 == 0 and dist.get_rank() == 0:
-        print(f'Step #{global_steps} Epoch #{epoch}: loss {loss}')
+        print(f'Step #{global_steps} Epoch #{epoch}: loss {loss} lr = {scheduler.get_last_lr()[0]}')
         tb_writer.add_scalar('loss', loss, global_steps)
     scheduler.step()
     if dist.get_rank() == 0:
