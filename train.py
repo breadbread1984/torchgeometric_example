@@ -14,7 +14,7 @@ from torch.utils.data import distributed
 from torch_geometric.loader import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from create_datasets import Molecule
-from models import ConductivityPredictor
+from models import Predictor
 
 FLAGS = flags.FLAGS
 
@@ -37,7 +37,7 @@ def main(unused_argv):
   if dist.get_rank() == 0:
     print(f'trainset size: {len(trainset)}')
   train_dataloader = DataLoader(trainset, batch_size = FLAGS.batch, shuffle = False, num_workers = FLAGS.workers, sampler = trainset_sampler, pin_memory = False)
-  model = ConductivityPredictor()
+  model = Predictor()
   model.to(device(FLAGS.device))
   model = DDP(model, device_ids = [dist.get_rank()], output_device = dist.get_rank(), find_unused_parameters = True)
   mae = L1Loss()
