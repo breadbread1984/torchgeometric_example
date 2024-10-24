@@ -17,4 +17,5 @@ class Predictor(nn.Module):
       results = conv(results, edge_index)
     results = global_mean_pool(results, batch)
     results = self.head(results)
+    results = torch.sinh(results)
     return results
