@@ -50,6 +50,7 @@ class ConductivityPredictor(nn.Module):
       results = conv(results, edge_index) # results.shape = (num_node, channels)
     results = global_mean_pool(results, batch) # results.shape = (graph_num, channels)
     results = self.head(results) # results.shape = (graph_num, 1)
+    results = torch.sinh(results)
     return results
 
 if __name__ == "__main__":
